@@ -11,7 +11,8 @@ namespace numlib
 {
 
   ldouble fpi(const functionX &gfunc,
-              const ldouble x0)
+              const ldouble x0,
+              ldouble tol)
   {
     ldouble* x = new ldouble[3];
     size_t counter = 0;
@@ -19,10 +20,10 @@ namespace numlib
     x[1] = x0 + 1;
     x[2] = x0;
     x[0] = gfunc(x[2]) - x[2];
-    std::cout << "this far: " << std::abs(df(gfunc,x[2])) << "\n";
-    while(!check(x)
-        && ++counter < MAX_IT
-        && std::abs(df(gfunc,x[2])) <= 10)
+    //std::cout << "this far: " << std::abs(df(gfunc,x[2])) << "\n";
+    while(!check(x,tol)
+        && ++counter < MAX_IT)
+        //&& std::abs(df(gfunc,x[2])) <= 1)
     {
       x[1] = x[2];
       x[2] = gfunc(x[1]);
@@ -34,7 +35,8 @@ namespace numlib
 
   ldouble fpi(const functionX &func,
               const ldouble x0,
-              const short cc)
+              const short cc,
+              ldouble tol)
   {
     ldouble c;
     if(cc==0)
@@ -46,50 +48,64 @@ namespace numlib
     functionX tmpFunc = [=](const double x){
       return x - func(x)*c;
     };
-    return fpi(tmpFunc, x0);
+    return fpi(tmpFunc, x0,tol);
   }
 
   // Slope
   ldouble nr_method(const functionX &func,
                     const  functionX &dfunc,
-                    const ldouble x0)
+                    const ldouble x0,
+                    ldouble tol)
   {
     functionX tmpFunc = [&](const ldouble x)
         {return func(x)/dfunc(x);};
 
-    return fpi(tmpFunc, x0,-1);
+    return fpi(tmpFunc, x0,-1,tol);
+  }
+
+  ldouble nr_method(const functionX &func,
+                    const ldouble x0,
+                    ldouble tol)
+  {
+    functionX tmpFunc = [&](const ldouble x)
+        {return func(x)/df(func,x);};
+
+    return fpi(tmpFunc, x0,-1,tol);
   }
 
   ldouble mod_nr_method(const functionX &func,
                      const functionX &dfunc,
                      const functionX &ddfunc,
-                     const ldouble x0)
+                     const ldouble x0,
+                     ldouble tol)
   {
     functionX tmpFunc = [&](const ldouble x)
         {return (func(x)*dfunc(x)) / (dfunc(x)*dfunc(x) - func(x)*ddfunc(x));};
 
-    return fpi(tmpFunc, x0, 1);
+    return fpi(tmpFunc, x0, 1,tol);
   }
 
   ldouble mod_nr_method(const functionX &func,
-                     const ldouble x0)
+                       const ldouble x0,
+                       ldouble tol)
   {
     functionX tmpFunc = [&](const ldouble x)
         {return (func(x)*df(func,x)) / (df(func,x)*df(func,x) - func(x)*ddf(func,x));};
 
-    return fpi(tmpFunc, x0, 1);
+    return fpi(tmpFunc, x0, 1,tol);
   }
 
   ldouble secant_method(const functionX &func,
                         const ldouble x0,
-                        const ldouble x1)
+                        const ldouble x1,
+                        ldouble tol)
   {
     ldouble* x = new ldouble[3];
     size_t counter = 0;
     x[0] = func(x1);
     x[1] = x0;
     x[2] = x1;
-    while(!check(x) && ++counter < MAX_IT)
+    while(!check(x,tol) && ++counter < MAX_IT)
     {
       x[0] = x[1];
       x[1] = x[2];
@@ -107,7 +123,8 @@ namespace numlib
   // Bracketing
   ldouble bisection_method(const functionX &func,
                            const ldouble xa,
-                           const ldouble xb)
+                           const ldouble xb,
+                           ldouble tol)
   {
     size_t counter = 0;
     ldouble* x = new ldouble[3];
@@ -118,7 +135,7 @@ namespace numlib
 
     if(func(xa)*func(xb) > 0) throw out_of_bounds();
 
-    while(!check(x)
+    while(!check(x,tol)
         && ++counter < MAX_IT)
     {
       if(opsign > 0)
@@ -145,7 +162,8 @@ namespace numlib
 
   ldouble rf_method(const functionX &func,
                     const ldouble x0,
-                    const ldouble x1)
+                    const ldouble x1,
+                    ldouble tol)
   {
     ldouble* x = new ldouble[3];
     ldouble tmp;
@@ -159,7 +177,7 @@ namespace numlib
     if(func(x[0]) * func(x[1]) > 0)
       throw out_of_bounds();
 
-    while(!check(x)
+    while(!check(x,tol)
         && ++counter < MAX_IT)
     {
       if(opsign > 0)
@@ -174,7 +192,7 @@ namespace numlib
       x[2] = x[1] - func(x[1])/df(func,x[1], x[1] - x[0]);
 
       // To improve stability, swap if it gets stuck
-      if(x[2] - x[1] < TOLERANCE)
+      if(x[2] - x[1] < tol)
       {
         tmp = x[1];
         x[1] = x[0];
@@ -293,20 +311,21 @@ namespace numlib
     return;
   }
 
-  bool check(const ldouble* inp)
+  bool check(const ldouble* inp,
+             ldouble tol)
   {
     nl_root_error ct;
     ct = nl_root_error::RELATIVE;
     switch(ct)
     {
       case nl_root_error::ABSOLUTE:
-        return absErr(inp[1], inp[2]) < TOLERANCE;
+        return absErr(inp[1], inp[2]) < tol;
         break;
       case nl_root_error::RELATIVE:
-        return relErr(inp[1], inp[2]) < TOLERANCE;
+        return relErr(inp[1], inp[2]) < tol;
         break;
       case nl_root_error::ZERO:
-        return zeroErr(*inp) < TOLERANCE;
+        return zeroErr(*inp) < tol;
         break;
       default:
         throw input_error();
