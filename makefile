@@ -43,24 +43,37 @@ HEADERS = $(wildcard headers/*.hpp)
 #SOURCES:sh = ls *.cpp
 #HEADERS:sh = ls *.h
 
-OBJECTS = $(SOURCES:src/%.cpp=bin/%.o)
+LIBRARY=lib/libcppnl.a
 
-default: driver
+OBJECTS = $(SOURCES:src/%.cpp=bin/%.o)
+TESTSRC=test.cpp
+TESTOBJ=test.o
+default: ${LIBRARY}
 
 bin/%.o: src/%.cpp
 	@echo "Compiling $<"
 	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
-all: driver
+all: ${LIBRARY} driver
 
-install: all
-
-driver: $(OBJECTS)
+${LIBRARY}: $(OBJECTS)
 	@echo "Building $@"
-	@$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $@
+#	@$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) -o $@
+	@ar crf $@ ${OBJECTS}
+	@echo ""
+	@echo "Library Build Complete"
+	@echo ""
+
+driver: $(OBJECTS) ${TESTOBJ}
+	@echo "Building $@"
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) $(OBJECTS) ${TESTOBJ} -o $@
 	@echo ""
 	@echo "Compilation Complete"
 	@echo ""
+
+${TESTOBJ}: ${TESTSRC}
+	@echo "Compiling $<"
+	@$(CXX) $(CXXFLAGS) $(INCLUDE) -c $< -o $@
 
 clean:
 	-@rm -f core
@@ -69,7 +82,7 @@ clean:
 	-@rm -f $(OBJECTS)
 
 # Automatically generate dependencies and include them in Makefile
-depend: $(SOURCES) $(HEADERS)
+depend: $(SOURCES) ${TESTSRC} $(HEADERS)
 	@echo "Generating dependencies"
 	@$(CXX) $(INCLUDE) -MM src/*.cpp > $@
 
