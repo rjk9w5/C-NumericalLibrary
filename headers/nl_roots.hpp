@@ -35,7 +35,8 @@ namespace numlib
 
   ldouble fpi(const functionX &func,
               const ldouble x0,
-              const short cc,
+              const int p,
+              const ldouble cc,
               ldouble tol=TOLERANCE);
 
 //  Slope

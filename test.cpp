@@ -35,7 +35,7 @@ int main()
   cout << df(myFunc, 4) << '\n';
   cout << tdFunc(4) << '\n';
 //  cout << "FPI: " << fpi(myFunc,1.0,(short)-1) << '\n';
-  cout << "Newton Method: " << nr_method(myFunc, tdFunc, 1) << '\n';
+  cout << "Newton Method: " << nr_method(myFunc, tdFunc, 2.4) << '\n';
 //  cout << "Modified Newton Method: " << mod_nr_method(myFunc, tdFunc, tddFunc, 1) << '\n';
 //  cout << "Modified Newton Method (Numerical Derivatives): " << mod_nr_method(myFunc, 1) << '\n';
 //  cout << "Secant Method: " << secant_method(myFunc, 1, 2) << '\n';
@@ -47,12 +47,17 @@ int main()
 
 double tFunc(const double x)
 {
-  return 2*x*cos(x*x)*(1 + x);
+  //return 2*x*cos(x*x)*(1 + x);
+  double S = sin(x*x);
+  return 2*S - 3*x*S + x*x*S;
 }
 
 double tdFunc(const double x)
 {
-  return (2*cos(x*x) - 4*x*x*sin(x*x))*(x+1) + tFunc(x)/(1+x);
+  //return (2*cos(x*x) - 4*x*x*sin(x*x))*(x+1) + tFunc(x)/(1+x);
+  double S = sin(x*x);
+  double C = cos(x*x);
+  return 2*x*C*(x*x - 3*x + 2) + S*(2*x - 3);
 }
 
 double tddFunc(const double x)
