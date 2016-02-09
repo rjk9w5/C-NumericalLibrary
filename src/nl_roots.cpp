@@ -35,18 +35,11 @@ namespace numlib
 
   ldouble fpi(const functionX &func,
               const ldouble x0,
-              const short cc,
+              const ldouble cc,
               ldouble tol)
   {
-    ldouble c;
-    if(cc==0)
-      c = 1 / df(func,x0);
-    else if(cc==2)
-      c = -1 / df(func,x0);
-    else
-      c = cc;
     functionX tmpFunc = [=](const double x){
-      return x - func(x)*c;
+      return x - func(x)*cc;
     };
     return fpi(tmpFunc, x0,tol);
   }
@@ -57,20 +50,35 @@ namespace numlib
                     const ldouble x0,
                     ldouble tol)
   {
-    functionX tmpFunc = [&](const ldouble x)
-        {return func(x)/dfunc(x);};
+    functionX stepFunc = [&](const ldouble x)
+        {return x - func(x)/dfunc(x);};
 
-    return fpi(tmpFunc, x0,-1,tol);
+//    ldouble* x = new ldouble[3];
+//    size_t counter = 0;
+//
+//    x[1] = x0 + 1;
+//    x[2] = x0;
+//    x[0] = func(x[2]);
+//    std::cout << "this far: " << std::abs(df(stepFunc,x[2])) << "\n";
+//    while(!check(x,tol)
+//        && ++counter < MAX_IT)
+//    {
+//      x[1] = x[2];
+//      x[2] = stepFunc(x[1]);
+//      x[0] = stepFunc(x[2]);
+//      outputStep(x, counter);
+//    }
+//    return x[2];
+
+    return fpi(stepFunc, x0);
   }
 
   ldouble nr_method(const functionX &func,
                     const ldouble x0,
                     ldouble tol)
   {
-    functionX tmpFunc = [&](const ldouble x)
-        {return func(x)/df(func,x);};
-
-    return fpi(tmpFunc, x0,-1,tol);
+    functionX dfunc = [&](const ldouble x){return df(func,x);};
+    return nr_method(func, dfunc , x0 ,tol);
   }
 
   ldouble mod_nr_method(const functionX &func,
