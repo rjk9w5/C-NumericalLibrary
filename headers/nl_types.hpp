@@ -9,7 +9,7 @@
 #include <cmath>
 
 
-namespace numlib
+namespace nl
 {
   typedef long double ldouble;
   const ldouble PI = acos(-1.0L);

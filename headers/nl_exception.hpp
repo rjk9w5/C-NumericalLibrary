@@ -8,32 +8,33 @@
 
 #include <exception>
 
-class divide_by_zero: public std::exception
+namespace nl
 {
-  public:
+  class divide_by_zero: public std::exception
+  {
+    public:
+      const char* what() const noexcept
+      {
+        return "Attempt to divide by zero: Abort\n";
+      }
+  };
+
+  class out_of_bounds: public std::exception
+  {
     const char* what() const noexcept
     {
-      return "Attempt to divide by zero: Abort\n";
+      return "Solution is not bounded: Abort\n";
     }
-};
+  };
 
-class out_of_bounds: public std::exception
-{
-  const char* what() const noexcept
+  class input_error: public std::exception
   {
-    return "Solution is not bounded: Abort\n";
-  }
-};
+    const char* what() const noexcept
+    {
+      return "Improper input argument: Abort\n";
+    }
+  };
 
-class input_error: public std::exception
-{
-  const char* what() const noexcept
-  {
-    return "Improper input argument: Abort\n";
-  }
-};
-
-
-
+}
 
 #endif /* NL_EXCEPTION_HPP_ */

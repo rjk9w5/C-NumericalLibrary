@@ -7,7 +7,7 @@
 #include "nl_roots.hpp"
 
 // General
-namespace numlib
+namespace nl
 {
 
   ldouble fpi(const functionX &gfunc,
@@ -73,8 +73,6 @@ namespace numlib
       outputStep(x, counter);
     }
     return x[2];
-
-    //return fpi(stepFunc, x0, tol);
   }
 
   ldouble nr_method(const functionX &func,

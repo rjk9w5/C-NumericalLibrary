@@ -3,7 +3,7 @@
 
 #include <functional>
 
-namespace numlib
+namespace nl
 {
 
 typedef long double ldouble;

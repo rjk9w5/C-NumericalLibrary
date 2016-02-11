@@ -4,6 +4,8 @@
 /// @brief Take numerical derivatives: Implementation
 //////////////////////////////////////////////////////////////////////
 
+
+/*
 #include "nl_derivatives.hpp"
 
 namespace numlib
@@ -38,3 +40,4 @@ ldouble ddf(const functionX &func,
 }
 
 } // namespace numlib
+*/

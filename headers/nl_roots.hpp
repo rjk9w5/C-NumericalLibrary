@@ -21,7 +21,7 @@
 // @fn:   fpi(functionX g, const double x0)
 // @desc: Fixed Point Iteration with user defined input g(x)
 
-namespace numlib
+namespace nl
 {
 
   const ldouble TOLERANCE = pow(10L,-8L); // 1e-12
@@ -48,7 +48,7 @@ namespace numlib
 
   ldouble nr_method(const functionX &func,
                     const ldouble x0,
-                    ldouble tol);
+                    ldouble tol=TOLERANCE);
 
 
   ldouble mod_nr_method(const functionX &func,

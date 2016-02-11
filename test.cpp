@@ -11,7 +11,8 @@
 #include "nl_roots.hpp"
 #include <memory>
 #include <cmath>
-using namespace numlib;
+#include <iomanip>
+using namespace nl;
 
 //#include "../headers/rFunction.hpp"
 using std::cout;
@@ -25,6 +26,28 @@ int main()
 {
   functionX myFunc = tFunc;
   std::unique_ptr<int[]> x(new int[5]);
+  int row=4, col=4;
+  std::unique_ptr<std::unique_ptr<long double[]>[]> mat;
+
+
+  mat.reset(new std::unique_ptr<long double[]>[row]);
+  for(int i=0; i<row; ++i)
+    mat[i].reset(new long double[col]);
+
+  for(int i=0; i<row; ++i)
+  {
+    for(int j=0; j<col; ++j)
+      mat[i][j] = static_cast<long double>(1)/((i+1)+(j+1)-1);
+  }
+  std::cout << "Made matrix\n\n\n";
+  for(int i=0; i<row; ++i)
+  {
+    for(int j=0; j<col; ++j)
+      std::cout << std::setprecision(12) << mat[i][j] << ' ';
+    std::cout << '\n';
+  }
+
+  std::cout << mat[0][0] << '\n';
 
   std::cout << numlib::TOLERANCE << '\n';
   for(int i=0; i<5; ++i)
@@ -32,7 +55,7 @@ int main()
     cout << x[i];
   }
   cout << "\n\n";
-  cout << df(myFunc, 4) << '\n';
+  cout << df(myFunc, 4.0) << '\n';
   cout << tdFunc(4) << '\n';
 //  cout << "FPI: " << fpi(myFunc,1.0,(short)-1) << '\n';
   cout << "Newton Method: " << nr_method(myFunc, tdFunc, 2.4) << '\n';
