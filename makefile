@@ -23,12 +23,12 @@
 
 CXX = /usr/bin/g++
 CXXFLAGS = -g -Wall -W -pedantic-errors -std=c++11
-INCLUDE = -I./headers/
+INCLUDE = -I./headers/ -I./headers/containers/
 # The following 2 lines only work with gnu make.
 # It's much nicer than having to list them out,
 # and less error prone.
 SOURCES = $(wildcard src/*.cpp)
-HEADERS = $(wildcard headers/*.hpp)
+HEADERS = $(wildcard headers/*.hpp) ${wildcard headers/containers/*.hpp}
 # Using subfolder organization
 # SOURCES = ${wildcard src/*.cpp}
 # HEADERS = ${wildcard include/*.hpp}
@@ -46,8 +46,9 @@ HEADERS = $(wildcard headers/*.hpp)
 LIBRARY=lib/libcppnl.a
 
 OBJECTS = $(SOURCES:src/%.cpp=bin/%.o)
-TESTSRC=test.cpp
+TESTSRC=test2.cpp
 TESTOBJ=test.o
+
 default: ${LIBRARY}
 
 bin/%.o: src/%.cpp
@@ -80,7 +81,7 @@ clean:
 	-@rm -f driver
 	-@rm -f depend
 	-@rm -f $(OBJECTS)
-
+	-@rm -f $(TESTOBJ)
 # Automatically generate dependencies and include them in Makefile
 depend: $(SOURCES) ${TESTSRC} $(HEADERS)
 	@echo "Generating dependencies"

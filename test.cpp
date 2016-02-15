@@ -12,6 +12,7 @@
 #include <memory>
 #include <cmath>
 #include <iomanip>
+#include "nl_l_matrix.hpp"
 using namespace nl;
 
 //#include "../headers/rFunction.hpp"
@@ -22,7 +23,7 @@ double tdFunc(const double x);
 double tddFunc(const double x);
 
 
-int main()
+int main(int argc, char* argv[])
 {
   functionX myFunc = tFunc;
   std::unique_ptr<int[]> x(new int[5]);
@@ -49,7 +50,7 @@ int main()
 
   std::cout << mat[0][0] << '\n';
 
-  std::cout << numlib::TOLERANCE << '\n';
+  std::cout << TOLERANCE << '\n';
   for(int i=0; i<5; ++i)
   {
     cout << x[i];
