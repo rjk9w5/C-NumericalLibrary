@@ -28,7 +28,7 @@ INCLUDE = -I./headers/ -I./headers/containers/
 # It's much nicer than having to list them out,
 # and less error prone.
 SOURCES = $(wildcard src/*.cpp)
-HEADERS = $(wildcard headers/*.hpp) ${wildcard headers/containers/*.hpp}
+HEADERS = $(wildcard headers/*.h) ${wildcard headers/containers/*.h}
 # Using subfolder organization
 # SOURCES = ${wildcard src/*.cpp}
 # HEADERS = ${wildcard include/*.hpp}
