@@ -1,47 +1,38 @@
-//////////////////////////////////////////////////////////////////////
-/// @file derivatives.hpp
-/// @author Ryan J. Krattiger (rjk9w5) 
-/// @brief Take numerical derivatives: Definitions
-//////////////////////////////////////////////////////////////////////
-#ifndef NL_DERIVATIVES_HPP_
-#define NL_DERIVATIVES_HPP_
-
-
-#include <functional>
-#include "nl_exception.hpp"
-#include "nl_function_types.hpp"
-
-namespace nl
-{
-const ldouble DX_DEFAULT = 0.00001;
-
+/*
+ * nl_derivatives.tpp
+ *
+ *  Created on: Feb 10, 2016
+ *      Author: ryan
+ */
 template<class F, class X>
 X df(const F &func,
-           const X x,
-           const X dx=DX_DEFAULT);
-//ldouble df(const functionX &func,
-//           const ldouble x,
-//           const ldouble dx=DX_DEFAULT);
+     const X x,
+     const X dx)
+{
+  if(dx == 0) throw divide_by_zero();
 
-template<class F, class X>
-X ddf(const F &func,
-            const X x0,
-            const X x1,
-            const X x2);
-//ldouble ddf(const functionX &func,
-//            const ldouble x0,
-//            const ldouble x1,
-//            const ldouble x2);
-
-template<class F, class X>
-X ddf(const F &func,
-            const X x,
-            const X dx=DX_DEFAULT);
-//ldouble ddf(const functionX &func,
-//            const ldouble x,
-//            const ldouble dx=DX_DEFAULT);
-
-#include "nl_derivatives.tpp"
+  return (func(x) - func(x - dx)) / dx;
 }
 
-#endif /* NL_DERIVATIVES_HPP_ */
+template<class F, class X>
+X ddf(const F &func,
+      const X x0,
+      const X x1,
+      const X x2)
+{
+  X dx1 = x2 - x1;
+  X dx2 = x1 - x0;
+  return (func(x0) - 2 * func(x1) + func(x2)) / (dx1*dx2);
+}
+
+template<class F, class X>
+X ddf(const F &func,
+      const X x,
+      const X dx)
+{
+    if(dx == 0) throw divide_by_zero();
+
+  return (func(x - dx) - (2*func(x)) + func(x + dx)) / (dx*dx);
+}
+
+
