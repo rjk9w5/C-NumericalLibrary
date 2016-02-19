@@ -8,8 +8,8 @@
 
 
 #include <functional>
-#include "nl_exception.hpp"
-#include "nl_function_types.hpp"
+#include "nl_exception.h"
+#include "nl_function_types.h"
 
 namespace nl
 {
@@ -41,7 +41,7 @@ X ddf(const F &func,
 //            const ldouble x,
 //            const ldouble dx=DX_DEFAULT);
 
-#include "nl_derivatives.tpp"
+#include "nl_derivatives.hpp"
 }
 
 #endif /* NL_DERIVATIVES_HPP_ */

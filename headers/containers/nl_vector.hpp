@@ -1,5 +1,5 @@
 /*
- * vector.tpp
+ * vector.hpp
  *
  *  Created on: Feb 5, 2016
  *      Author: Ryan Krattiger (rjk9w5)
@@ -8,23 +8,19 @@
  */
 
 template <class T>
-vector<T>::vector()
-{
-  m_size = 0;
-  m_max = 0;
-  m_data.reset(nullptr);
-}
+vector<T>::vector():
+    m_size(0), m_max(0), m_data(nullptr)
+{}
 
 template <class T>
-vector<T>::vector(const size_t size)
-{
-  resize(size);
-}
+vector<T>::vector(const size_t size):
+    m_size(size), m_max(size), m_data(new T[size])
+{}
 
 template <class T>
-vector<T>::vector(const size_t size, const T& value)
+vector<T>::vector(const size_t size, const T& value):
+    m_size(size), m_max(size), m_data(new T[size])
 {
-  resize(size);
   for(size_t i=0; i < m_size; ++i)
   {
     m_data[i] = value;
@@ -59,7 +55,6 @@ vector<T>::vector(const vector<T>& src)
 template <class T>
 vector<T>& vector<T>::operator=(vector<T> &&other)
 {
-  std::cout << "MOVED!!\n";
   if(this != &other)
   {
     m_size = other.m_size;
@@ -219,7 +214,51 @@ vector<T> vector<T>::slice(const T* start, const T* stop, const size_t step) con
   return ret;
 }
 
+template <class T>
+int vector<T>::find(const T& value)
+{
+  size_t i_left=0;
+  size_t i_right = m_size-1;
+  size_t index = (i_right - i_left)/2;
+
+  if(m_data[i_right] == value) return i_right;
+  if(m_data[i_left] == value) return i_left;
+
+  while(m_data[index] != value)
+  {
+    if(m_data[index] > value)
+    {
+      i_right = index;
+      index = i_left + (i_right - i_left)/2;
+    }
+    else if(m_data[index] < value)
+    {
+          i_left = index;
+          index = i_left + (i_right - i_left)/2;
+    }
+
+    if(i_left == index) return -1;
+  }
+
+  return index;
+}
+
 // MATH
+template <class T>
+vector<T> vector<T>::dot(const vector<T>& vec) const
+{
+  if(v1.get_size() != v2.get_size()) throw std::exception();
+
+  vector<T> ret(v1.get_size());
+  size_t it=-1;
+  for(auto val: v1)
+  {
+    ret[++it] += (val*v2[it]);
+  }
+
+  return ret;
+}
+
 template <class T>
 vector<T> dot(const vector<T>& v1, const vector<T>& v2)
 {

@@ -1,5 +1,5 @@
 /*
- * vector.hpp
+ * vector.h
  *
  *  Created on: Feb 5, 2016
  *      Author: Ryan Krattiger (rjk9w5)
@@ -179,6 +179,11 @@ template <class T>
 vector<T> operator - (const vector<T>& v1, const vector<T>& v2);
 template <class T>
 vector<T> operator - (const vector<T>& vec);
+template <class T>
+T sum(const vector<T>& vec);
+template <class T>
+T dot(const vector<T>& v1, const vector<T>& v2);
+
 
 // VECTOR CLASS
 template<class T>
@@ -204,33 +209,38 @@ class vector
     const T& operator[](const size_t i) const;
     T& operator[](const size_t i);
     void sort();
-    T* begin();
-    T* end();
+    T* begin() const;
+    T* end() const;
     vector<T> slice(const T* start=begin(), const T* stop=end(), const size_t step=1) const;
+    int find(const T& val);
 
     // MATH
-    friend T& dot <> (const vector<T>& v1, const vector<T>& v2);
+    T sum() const;
+    T dot(const vector<T>& vec) const;
     friend vector<T> operator * <> (const vector<T>& v1, const vector<T>& v2);
     friend vector<T> operator * <> (const T& C, const vector<T>& v2);
     friend vector<T> operator * <> (const vector<T>& v1, const T& C);
-    const vector<T>& operator += (const vector<T>& vec);
+    vector<T>& operator += (const vector<T>& vec);
     friend vector<T> operator + <> (const vector<T>& v1, const vector<T>& v2);
     friend vector<T> operator - <> (const vector<T>& v1, const vector<T>& v2);
     friend vector<T> operator - <> (const vector<T>& vec);
+    friend T sum <> (const vector<T>& vec);
+    friend T dot <> (const vector<T>& v1, const vector<T>& v2);
 
     // FRIENDS
-    friend T& sum <>(const vector<T> vec);
-    friend vector<T>& cat<>(const vector<T>& a1, const vector<T>& a2);
-    friend bool operator == <>(const vector<T>& lhs, const vector<T>& rhs);
-    friend bool operator != <>(const vector<T>& lhs, const vector<T>& rhs);
-    friend std::ostream& operator << <>(std::ostream& out, const vector<T>& vec);
-    friend std::istream& operator >> <>(std::istream& in, vector<T>& vec);
+    friend T& sum <> (const vector<T> vec);
+    friend vector<T>& cat <> (const vector<T>& a1, const vector<T>& a2);
+    friend bool operator == <> (const vector<T>& lhs, const vector<T>& rhs);
+    friend bool operator != <> (const vector<T>& lhs, const vector<T>& rhs);
+    friend std::ostream& operator << <> (std::ostream& out, const vector<T>& vec);
+    friend std::istream& operator >> <> (std::istream& in, vector<T>& vec);
+
 
   private:
     size_t m_size, m_max;
     std::unique_ptr<T[]> m_data;
 };
 
-#include "nl_vector.tpp"
+#include "nl_vector.hpp"
 } // nl namespace
 #endif /* VECTOR_HPP_ */

@@ -6,7 +6,7 @@
 #ifndef NL_U_MATRIX_HPP_
 #define NL_U_MATRIX_HPP_
 
-#include "nl_vector.hpp"
+#include "nl_vector.h"
 #include <utility>
 #include <ostream>
 #include <iomanip>
@@ -42,7 +42,7 @@ class u_matrix//: matrix<l_matrix, T>
     T empty;
 };
 
-#include "nl_u_matrix.tpp"
+#include "nl_u_matrix.hpp"
 }
 
 

@@ -4,7 +4,7 @@
 /// @brief BRIEF_DESCRIPTION_HERE
 //////////////////////////////////////////////////////////////////////
 //*
-#include "nl_roots.hpp"
+#include "nl_roots.h"
 
 // General
 namespace nl

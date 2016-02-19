@@ -10,10 +10,10 @@
 #include <iomanip>
 #include <memory>
 #include <cmath>
-#include "nl_derivatives.hpp"
-#include "nl_exception.hpp"
-#include "nl_function_types.hpp"
-#include "nl_options.hpp"
+#include "nl_derivatives.h"
+#include "nl_exception.h"
+#include "nl_function_types.h"
+#include "nl_options.h"
 
 // @fn:   fpi(functionX f, const double x0, const short cc)
 // @desc: Fixed Point Iteration with for g(x) = x - cc*c*f(x)

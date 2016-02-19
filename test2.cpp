@@ -4,9 +4,9 @@
 /// @brief BRIEF_DESCRIPTION_HERE
 //////////////////////////////////////////////////////////////////////
 
-#include "nl_l_matrix.hpp"
-#include "nl_u_matrix.hpp"
-#include "nl_vector.hpp"
+#include "nl_l_matrix.h"
+#include "nl_u_matrix.h"
+#include "nl_vector.h"
 #include <iostream>
 using namespace nl;
 
@@ -15,7 +15,7 @@ int main(int argc, char* argv[])
   std::cout << argc << argv[0] << std::endl;
   l_matrix<double> L(5);
   u_matrix<double> U(5);
-  vector<double> v;
+  vector<double> v(15);
 
   for(int r=0; r<5; ++r)
   {
@@ -25,6 +25,11 @@ int main(int argc, char* argv[])
     }
   }
 
+  for(int i=0; i<15; ++i)
+    v[i] = i;
+
+  std::cout << v.find(2) << std::endl;
+
   for(int r=0; r<5; ++r)
   {
     for(int c=0; c<5; ++c)
@@ -33,6 +38,7 @@ int main(int argc, char* argv[])
     }
   }
 
+  std::cout << v*v << std::endl;
 
 
   std::cout << L << std::endl;
