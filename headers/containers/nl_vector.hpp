@@ -8,38 +8,45 @@
  */
 
 template <class T>
-vector<T>::vector():
-    m_size(0), m_max(0), m_data(nullptr)
-{}
-
-template <class T>
-vector<T>::vector(const size_t size):
-    m_size(size), m_max(size), m_data(new T[size])
-{}
-
-template <class T>
-vector<T>::vector(const size_t size, const T& value):
-    m_size(size), m_max(size), m_data(new T[size])
+oonm::Vector<T>::Vector()
 {
-  for(size_t i=0; i < m_size; ++i)
+  size_ = 0;
+  data_ = nullptr;
+}
+
+template <class T>
+oonm::Vector<T>::Vector(const size_t size)
+{
+  size_ = 0;
+  data_ = new T[size];
+}
+
+template <class T>
+oonm::Vector<T>::Vector(const size_t size, const T& value)
+{
+  size_ = 0;
+  data_ = new T[size];
+  for(size_t i=0; i < size_; ++i)
   {
-    m_data[i] = value;
+    data_[i] = value;
   }
 }
 
 template <class T>
-vector<T>& vector<T>::operator=(const vector<T>& src)
+oonm::Vector<T>& oonm::Vector<T>::operator=(const oonm::Vector<T>& src)
 {
+  //std::cerr << "Okay Here\n";
   if(this != &src)
   {
-    m_size = src.m_size;
-    m_max = src.m_max;
+    //this -> clear();
+    // TODO: Figure out how to make copy and swap technique work.
+    size_ = src.size_;
 
-    m_data.reset(new T[m_size]);
+    data_ = new T[size_];
 
-    for(size_t i = 0; i < m_size; ++i)
+    for(size_t i = 0; i < size_; ++i)
     {
-      m_data[i] = src.m_data[i];
+      data_[i] = src.data_[i];
     }
   }
 
@@ -47,191 +54,206 @@ vector<T>& vector<T>::operator=(const vector<T>& src)
 }
 
 template <class T>
-vector<T>::vector(const vector<T>& src)
+oonm::Vector<T>::Vector(const oonm::Vector<T>& src)
 {
   *this = src;
 }
 
 template <class T>
-vector<T>& vector<T>::operator=(vector<T> &&other)
+oonm::Vector<T>& oonm::Vector<T>::operator=(oonm::Vector<T> &&other)
 {
   if(this != &other)
   {
-    m_size = other.m_size;
-    m_max = other.m_max;
+    clear();
+    size_ = other.size_;
 
-    m_data = std::move(other.m_data);
-    other.m_data.reset(nullptr);
+    data_ = other.data_;
+    other.data_ = nullptr;
   }
 
   return *this;
 }
 
 template <class T>
-vector<T>::vector(vector<T> &&other)
+oonm::Vector<T>::Vector(oonm::Vector<T> &&other)
 {
   *this = std::move(other);
 }
 
 template <class T>
-vector<T>::~vector()
+oonm::Vector<T>::~Vector()
 {
+  clear();
 }
 
 template <class T>
-void vector<T>::resize(const size_t size)
+void oonm::Vector<T>::resize(const size_t size)
 {
-  std::unique_ptr<T[]> tmp;
-  size_t nit = (size > m_size?m_size:size);
-  if(size < 0) std::exception();
+  T* tmp = nullptr;
+  size_t nit = (size > size_?size_:size);
+  if(size < 0) nl::FatalError("oonm::Vector<T>::resize(const size_t size):" \
+                              " Input size must be greater than or equal to"\
+                              " zero!\n");
 
-  if(m_data != nullptr && m_size > 0 && size)
+  if(data_ != nullptr && size_ && size)
   {
-    tmp.reset(new T[m_size]);
-    for(size_t i=0; i < m_size; ++i)
+    tmp = new T[size_];
+    for(size_t i=0; i < size_; ++i)
     {
-      tmp[i] = m_data[i];
+      tmp[i] = data_[i];
     }
   }
-  m_data.reset(new T[size]);
+  clear();
+  data_ = new T[size];
+
   if(tmp != nullptr)
   {
     for(size_t i=0; i < nit; ++i)
     {
-      m_data[i] = tmp[i];
+      data_[i] = tmp[i];
     }
   }
-  m_size = size;
-  m_max = size;
+  size_ = size;
 
   return;
 }
 
 template <class T>
-void vector<T>::reuse(const size_t size)
+void oonm::Vector<T>::reuse(const size_t size)
 {
-  if(size=0)
+  clear();
+  if(size > 0)
+    data_ = new T[size];
+  else
+    data_ = nullptr;
+
+  size_ = size;
+
+  return;
+}
+
+template <class T>
+void oonm::Vector<T>::clear()
+{
+  if(data_ != nullptr && size_ > 0)
+    delete[] data_;
+
+  size_ = 0;
+
+  return;
+}
+
+template <class T>
+void oonm::Vector<T>::set_size(const size_t size)
+{
+  this->reuse(size);
+  return;
+}
+
+template <class T>
+void oonm::Vector<T>::remove(const size_t i)
+{
+  if(i < size_ && i >=0)
   {
-    m_data.reset(nullptr);
-    m_size = 0;
-    m_max = 0;
+    for(size_t j = i; j < size_ - 1; ++j)
+      data_[j] = data_[j+1];
+
+    size_--;
   }
   else
   {
-    this -> reuse();
-    this -> resize(size);
-  }
-    return;
-}
-
-template <class T>
-void vector<T>::set_size(const size_t size)
-{
-  this->resize(size);
-  return;
-}
-
-template <class T>
-void vector<T>::remove(const size_t i)
-{
-  if(i < m_size && m_size > 0 && i >=0)
-  {
-    for(size_t j = i; j < m_size - 1; ++j)
-      m_data[j] = m_data[j+1];
-
-    m_size--;
-  }
-  else
-  {
-    throw std::range_error("auto_array: remove: index 'i' is out of range\n");
+    throw nl::FatalError("oonm::Vector<T>::remove(const size_t i): "\
+                         "Index 'i' is out of range\n");
   }
 
   return;
 }
 
 template <class T>
-const T& vector<T>::operator[](const size_t i) const
+const T& oonm::Vector<T>::operator[](const size_t i) const
 {
-  if(i > m_size || i < 0)
+  if(i > size_ || i < 0)
   {
-    throw std::range_error("auto_array: subscript []: "\
-        "index 'i' is out of range");
+    throw nl::FatalError("oonm::Vector<T>::operator[](const size_t i) const: "\
+                         "Index 'i' is out of range\n");
   }
 
-  return m_data[i];
+  return data_[i];
 }
 
 template <class T>
-T& vector<T>::operator[](const size_t i)
+T& oonm::Vector<T>::operator[](const size_t i)
 {
-  if(i > m_size || i < 0)
+  if(i > size_ || i < 0)
   {
-    throw std::range_error("auto_array: subscript []: "\
-        "index 'i' is out of range");
+    throw nl::FatalError("oonm::Vector<T>::operator[](const size_t i): "\
+                         "Index 'i' is out of range\n");
   }
 
-  return m_data[i];
+  return data_[i];
 }
 
 // Must have < operator implemented
 template <class T>
-void vector<T>::sort()
+oonm::Vector<T>& oonm::Vector<T>::sort()
 {
-  if(!std::is_sorted(m_data.get(), m_data.get()+m_size))
-    std::sort(m_data.get(), m_data.get()+m_size);
-  //else
-    //std::cout << "No need to sort!\n";
+  if(!std::is_sorted(begin(), end()))
+    std::sort(begin(), end());
 
-  return;
+  return *this;
 }
 
 template <class T>
-T* vector<T>::begin() const
+T* oonm::Vector<T>::begin() const
 {
-  return m_data.get();
+  return data_;
 }
 
 template <class T>
-T* vector<T>::end() const
+T* oonm::Vector<T>::end() const
 {
-  return m_data.get() + m_size;
+  return data_+ size_;
 }
 
+// TODO: Fix this someday
+//template <class T>
+//oonm::Vector<T> oonm::Vector<T>::slice(const T* start, const T* stop, const size_t step) const
+//{
+//  size_t slice_size = size_/step +
+//                      ((size_%step||step>size_)&&size_!=step?1:0);
+//
+//  if(step <= 0 && start > begin() && stop < end())
+//    throw nl::FatalError("oonm::Vector<T>::slice(const T* " \
+//                         "start, const T* stop, const "     \
+//                         "size_t step): Invalid inputs!!\n");
+//
+//  oonm::Vector<T> ret(slice_size);
+//  size_t i=0;
+//  const T* it = start;
+//  for(; it<stop; it+=step)
+//    ret[i++] = *it;
+//
+//  return ret;
+//}
+
 template <class T>
-vector<T> vector<T>::slice(const T* start, const T* stop, const size_t step) const
-{
-  size_t slice_size = m_size/step +
-                      ((m_size%step||step>m_size)&&m_size!=step?1:0);
-
-  if(slice_size <= 0) throw std::exception();
-
-  vector<T> ret(slice_size);
-  size_t i=-1;
-  const T* it = start;
-  for(; it<stop; it+=step)
-    ret[++i] = *it;
-
-  return ret;
-}
-
-template <class T>
-int vector<T>::find(const T& value)
+int oonm::Vector<T>::find(const T& value)
 {
   size_t i_left=0;
-  size_t i_right = m_size-1;
+  size_t i_right = size_-1;
   size_t index = (i_right - i_left)/2;
 
-  if(m_data[i_right] == value) return i_right;
-  if(m_data[i_left] == value) return i_left;
+  if(data_[i_right] == value) return i_right;
+  if(data_[i_left] == value) return i_left;
 
-  while(m_data[index] != value)
+  while(data_[index] != value)
   {
-    if(m_data[index] > value)
+    if(data_[index] > value)
     {
       i_right = index;
       index = i_left + (i_right - i_left)/2;
     }
-    else if(m_data[index] < value)
+    else if(data_[index] < value)
     {
           i_left = index;
           index = i_left + (i_right - i_left)/2;
@@ -245,163 +267,240 @@ int vector<T>::find(const T& value)
 
 // MATH
 template <class T>
-vector<T> vector<T>::dot(const vector<T>& vec) const
+T oonm::Vector<T>::dot(const oonm::Vector<T>& vec) const
 {
-  if(v1.get_size() != v2.get_size()) throw std::exception();
+  if(vec.get_size() != get_size())
+    throw nl::FatalError("oonm::Vector<T>::dot(const oonm::Vector<T>& vec): "\
+                         "Vectors must be of same size!\n");
 
-  vector<T> ret(v1.get_size());
-  size_t it=-1;
-  for(auto val: v1)
-  {
-    ret[++it] += (val*v2[it]);
-  }
+  T ret;
+  size_t it = 0;
+  for(auto& val: *this)
+    ret += val*vec[it++];
 
   return ret;
 }
 
 template <class T>
-vector<T> dot(const vector<T>& v1, const vector<T>& v2)
+T oonm::dot(const oonm::Vector<T>& v1, const oonm::Vector<T>& v2)
 {
-  if(v1.get_size() != v2.get_size()) throw std::exception();
-
-  vector<T> ret(v1.get_size());
-  size_t it=-1;
-  for(auto val: v1)
-  {
-    ret[++it] += (val*v2[it]);
-  }
-
-  return ret;
+  return v1.dot(v2);
 }
 
 template <class T>
-vector<T> operator * (const vector<T>& v1, const vector<T>& v2)
+T oonm::Vector<T>::operator * (const oonm::Vector<T>& vec) const
 {
-  vector<T> ret(v1);
-  size_t it=-1;
-  for(auto vec2: v2)
-  {
-    ret[++it] = ret[it]*vec2;
-  }
-
-  return ret;
+  return dot(vec);
 }
 
 template <class T>
-vector<T> operator * (const T& C, const vector<T>& v2)
+oonm::Vector<T> oonm::Vector<T>::operator * (const T& C) const
 {
-  vector<T> ret(v2.get_size());
+  oonm::Vector<T> ret(*this);
   size_t it=-1;
-  for(auto val: v2)
+  for(auto& val: *this)
     ret[++it] = val*C;
 
   return  ret;
 }
 
 template <class T>
-vector<T> operator * (const vector<T>& v1, const T& C)
+oonm::Vector<T> oonm::Vector<T>::operator / (const oonm::Vector<T>& v2) const
 {
-  return C*v1;
+  if(v2.get_size() != get_size())
+    throw nl::FatalError("oonm::Vector<T>::operator / " \
+                         "(const oonm::Vector<T>& v2): "\
+                         "Vectors must be of same size!\n");
+
+  oonm::Vector<T> ret(*this);
+  size_t it =0;
+  for(auto& val: v2)
+  {
+    ret[it++] /= val;
+  }
+  return ret;
 }
 
 template <class T>
-const vector<T>& vector<T>::operator += (const vector<T>& vec)
+oonm::Vector<T> oonm::Vector<T>::operator / (const T& C) const
 {
-  if(vec.get_size() != get_size()) throw std::exception();
+  oonm::Vector<T> ret(*this);
+  size_t it =0;
+  for(auto& val: ret)
+  {
+    ret[it++] /= C;
+  }
+  return ret;
+}
 
-  size_t it=-1;
-  for(auto val: *this)
-    *this[++it] += vec[it];
+template <class T>
+oonm::Vector<T> oonm::operator * (const T& C, const oonm::Vector<T>& v2)
+{
+    return v2*C;
+}
+
+template <class T>
+oonm::Vector<T>& oonm::Vector<T>::operator += (const oonm::Vector<T>& vec)
+{
+  if(vec.get_size() != get_size())
+    throw nl::FatalError("oonm::Vector<T>::operator += " \
+                             "(const oonm::Vector<T>& vec): "\
+                             "Vectors must be of same size!\n");
+
+  size_t it=0;
+  for(auto& val: vec)
+    this -> operator[](it++) += val;
 
   return *this;
 }
 
 template <class T>
-vector<T> operator + (const vector<T>& v1, const vector<T>& v2)
+oonm::Vector<T> oonm::operator + (const oonm::Vector<T>& v1,
+                                  const oonm::Vector<T>& v2)
 {
-  vector<T> ret(v1);
-  ret+=v2;
+  oonm::Vector<T> ret(v1);
 
-  return ret;
+  return ret += v2;
 }
 
 template <class T>
-vector<T> operator - (const vector<T>& v1, const vector<T>& v2)
+oonm::Vector<T>& oonm::Vector<T>::operator -= (const oonm::Vector<T>& vec)
 {
-  if(v1.get_size() != v2.get_size()) throw std::exception();
-
-  vector<T> ret(v1.get_size());
+  if(get_size() != vec.get_size())
+    throw nl::FatalError("oonm::operator - (const oonm::Vector<T>& v1," \
+                         "const oonm::Vector<T>& v2): "                 \
+                         "Vectors must be of same size!\n");
   size_t it=-1;
-  for(auto val: v1)
-    ret[++it] = val-v2[it];
+  for(auto& val: vec)
+    this -> operator[](++it) -= val;
 
-  return ret;
+  return *this;
 }
 
 template <class T>
-vector<T> operator - (const vector<T>& vec)
+oonm::Vector<T> oonm::operator - (const oonm::Vector<T>& v1,
+                            const oonm::Vector<T>& v2)
 {
-  vector<T> ret(vec);
+  oonm::Vector<T> ret(v1);
+
+  return ret-=v2;
+}
+
+template <class T>
+oonm::Vector<T> oonm::operator - (const oonm::Vector<T>& vec)
+{
+  oonm::Vector<T> ret(vec);
   size_t it=-1;
-  for(auto val: vec)
+  for(auto& val: vec)
     ret[++it] = -val;
 
   return ret;
 }
 
 template <class T>
-bool operator == (const vector<T>& lhs, const vector<T>& rhs)
+bool oonm::operator == (const oonm::Vector<T>& lhs,
+                  const oonm::Vector<T>& rhs)
 {
   size_t i = 0;
-  if(lhs.m_size == rhs.m_size)
+  if(lhs.size_ == rhs.size_)
   {
-    while(i < lhs.m_size && rhs.m_data[i] == lhs.m_data[i])
+    while(i < lhs.size_ && rhs.data_[i] == lhs.data_[i])
     {
       ++i;
     }
   }
 
-  return (i==rhs.m_size && i==lhs.m_size)?true:false;
+  return (i==rhs.size_ && i==lhs.size_)?true:false;
 }
 
 template <class T>
-bool operator != (const vector<T>& lhs, const vector<T>& rhs)
+bool oonm::operator != (const oonm::Vector<T>& lhs, const oonm::Vector<T>& rhs)
 {
     return !(lhs==rhs);
 }
 
 template <class T>
-std::ostream& operator<<(std::ostream& out, const vector<T>& vec)
+std::ostream& oonm::operator<<(std::ostream& out, const oonm::Vector<T>& vec)
 {
-  for(int i=0; i<vec.m_size; ++i)
+  for(size_t i=0; i<vec.size_; ++i)
   {
-    out << vec[i] << ' ';
+    out << std::setprecision(5)
+        << std::setw(10)
+        << std::left
+        << std::setfill(' ')
+        << vec[i];
   }
-
+  out << '\n';
   return out;
 }
 
 template <class T>
-std::istream& operator>>(std::istream& in, vector<T>& vec)
+std::istream& oonm::operator>>(std::istream& in, oonm::Vector<T>& vec)
 {
-  for(int i=0; i<vec.m_size; ++i)
+  for(size_t i=0; i<vec.size_ && in.good(); ++i)
   {
     in >> vec[i];
   }
 
+  //std::cout << (!in.good()?"Sees eof":"Sees happiness") << '\n';
   return in;
 }
 
 template <class T>
-vector<T> cat(const vector<T>& a1, const vector<T>& a2)
+oonm::Vector<T> cat(const oonm::Vector<T>& a1, const oonm::Vector<T>& a2)
 {
-  vector<T> ret(a1.get_size() + a2.get_size());
+  oonm::Vector<T> ret(a1.get_size() + a2.get_size());
   int i=-1;
-  for(auto val: a1)
+  for(auto& val: a1)
     ret[++i] = val;
 
-  for(auto val: a2)
+  for(auto& val: a2)
     ret[++i] = val;
 
    return ret;
+}
+
+template <class T>
+T oonm::Vector<T>::sum() const
+{
+  T sm=0;
+  for(auto& val: *this)
+  {
+    sm += val;
+  }
+  return sm;
+}
+
+template <class T>
+T oonm::sum(const oonm::Vector<T>& vec)
+{
+  return vec.sum();
+}
+
+template <class T>
+oonm::Vector<T> sqrt(const oonm::Vector<T>& vec)
+{
+  oonm::Vector<T> ret(vec.get_size());
+  size_t it = 0;
+
+  for(auto& val: vec)
+  {
+    ret[it++] = sqrt(val);
+  }
+
+  return ret;
+}
+
+template <class T>
+oonm::Vector<T> abs(const oonm::Vector<T>& vec)
+{
+  oonm::Vector<T> ret(vec.get_size());
+  size_t it = 0;
+
+  for(auto& val: vec)
+  {
+    ret[it++] = abs(val);
+  }
+
+  return ret;
 }
