@@ -349,17 +349,19 @@
 #ifndef VECTOR_HPP_
 #define VECTOR_HPP_
 
-#include "nl_exceptions.h"
-#include <iostream>
+#include "nl_exception.h"
+// IO includes
+#include <istream>
+#include <ostream>
 #include <iomanip>
-#include <algorithm>
+// Functionality includes
+#include <algorithm> // std::sort
 #include <cstddef>
-#include <memory>
-#include <utility>
-#include <cmath>
-#include <fstream>
+#include <cstdlib>
+#include <utility> // std::move
+#include <cmath> // std::pow, std::sqrt, std::abs, etc.
 
-namespace oonm
+namespace nl
 {
   // VECTOR DECLARATION
   template <class T>
@@ -418,7 +420,7 @@ namespace oonm
       void resize(const size_t size=0);
       void reuse(const size_t size=0);
       void clear();
-      void set_size(const size_t size);
+      void set_size(const size_t size, const size_t vert = 1);
       size_t get_size() const {return size_;}
       void remove(const size_t i);
       const T& operator[](const size_t i) const;
@@ -426,7 +428,7 @@ namespace oonm
       Vector<T>& sort();
       T* begin() const;
       T* end() const;
-      //Vector<T> slice(const T* start=begin(), const T* stop=end(), const size_t step=1) const;
+//      Vector<T> slice(const T* start=begin(), const T* stop=end(), const size_t step=1) const;
       int find(const T& val);
 
       // MATH
@@ -452,10 +454,11 @@ namespace oonm
 
     private:
       size_t size_;
+      bool vert_;
       T* data_;
   };
 
-} // oonm namespace
+} // nl namespace
 
 // MICELANIOUS (No comments because not used!)
 template <class T>
@@ -465,7 +468,7 @@ struct isVector
 };
 
 template <class T>
-struct isVector<oonm::Vector<T>>
+struct isVector<nl::Vector<T>>
 {
   static const bool value = true;
 };
@@ -473,11 +476,11 @@ struct isVector<oonm::Vector<T>>
 // TODO: Overload additional math functions from <cmath>. Also move to a
 //       different file because this thing is crazy!
 template <class T>
-oonm::Vector<T> sqrt(const oonm::Vector<T>& vec);
+nl::Vector<T> sqrt(const nl::Vector<T>& vec);
 
 template <class T>
-oonm::Vector<T> abs(const oonm::Vector<T>& vec);
+nl::Vector<T> abs(const nl::Vector<T>& vec);
 
-#include "vector.hpp"
+#include "nl_vector.hpp"
 
 #endif /* VECTOR_HPP_ */
