@@ -41,7 +41,7 @@ nl::Vector<T>& nl::Vector<T>::operator=(const nl::Vector<T>& src)
   //std::cerr << "Okay Here\n";
   if(this != &src)
   {
-    //this -> clear();
+    clear();
     // TODO: Figure out how to make copy and swap technique work.
     size_ = src.size_;
     vert_ = true;
@@ -137,9 +137,10 @@ void nl::Vector<T>::reuse(const size_t size)
 template <class T>
 void nl::Vector<T>::clear()
 {
-  if(data_ != nullptr && size_ > 0)
+  if(data_ != nullptr)
     delete[] data_;
 
+  data_ = nullptr;
   size_ = 0;
 
   return;
@@ -148,7 +149,21 @@ void nl::Vector<T>::clear()
 template <class T>
 void nl::Vector<T>::set_size(const size_t size, const size_t vert)
 {
-  this->reuse(size);
+  if(vert == 1)
+  {
+    vert_ = true;
+    reuse(size);
+  }
+  else if(size == 1 && vert != 1)
+  {
+    vert_ = false;
+    reuse(vert);
+  }
+  else if(size != 1 && vert != 1)
+  {
+    throw nl::FatalError("nl::Vector: set_size: A vector cannot handle this!");
+  }
+
   return;
 }
 
@@ -218,26 +233,28 @@ T* nl::Vector<T>::end() const
 }
 
 // TODO: Fix this someday
-//template <class T>
-//nl::Vector<T>
-//  nl::Vector<T>::slice
-//      (const T* start, const T* stop, const size_t step) const
-//{
-//  size_t slice_size = size_/step +
-//                      ((size_%step||step>size_)&&size_!=step?1:0);
-//
-//  if(step <= 0 && start > begin() && stop < end())
-//    throw nl::FatalError("nl::Vector<T>::slice(const T* start, const T* stop, "\
-//                         "const size_t step): Invalid inputs!\n");
-//
-//  nl::Vector<T> ret(slice_size);
-//  size_t i=0;
-//  const T* it = start;
-//  for(; it<stop; it+=step)
-//    ret[i++] = *it;
-//
-//  return ret;
-//}
+/*
+template <class T>
+nl::Vector<T>
+  nl::Vector<T>::slice
+      (const T* start, const T* stop, const size_t step) const
+{
+  size_t slice_size = size_/step +
+                      ((size_%step||step>size_)&&size_!=step?1:0);
+
+  if(step <= 0 && start > begin() && stop < end())
+    throw nl::FatalError("nl::Vector<T>::slice(const T* start, const T* stop, "\
+                         "const size_t step): Invalid inputs!\n");
+
+  nl::Vector<T> ret(slice_size);
+  size_t i=0;
+  const T* it = start;
+  for(; it<stop; it+=step)
+    ret[i++] = *it;
+
+  return ret;
+}
+*/
 
 template <class T>
 int nl::Vector<T>::find(const T& value)

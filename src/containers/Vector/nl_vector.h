@@ -1,9 +1,9 @@
 /*
- * vector.h
+ * nl_vector.h
  *
  *  Created on: Feb 5, 2016
  *      Author: Ryan Krattiger (rjk9w5)
- *       Brief: Declarations of vector template class and associated
+ *       Brief: Declarations of Vector template class and associated
  *              friend functions
  */
 
