@@ -12,7 +12,7 @@
 namespace nl
 {
   typedef long double ldouble;
-  const ldouble PI = acos(-1.0L);
+  constexpr ldouble PI = acos(-1.0L);
 }
 
 #endif /* NL_TYPES_HPP_ */
